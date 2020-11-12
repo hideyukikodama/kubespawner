@@ -1576,6 +1576,7 @@ class KubeSpawner(Spawner):
         """
         state = super().get_state()
         state['pod_name'] = self.pod_name
+        state['namespace'] = self.namespace
         return state
 
     def get_env(self):
@@ -1596,13 +1597,15 @@ class KubeSpawner(Spawner):
         Load state from storage required to reinstate this user's pod
 
         Since this runs after `__init__`, this will override the generated `pod_name`
-        if there's one we have saved in state. These are the same in most cases,
-        but if the `pod_template` has changed in between restarts, it will no longer
-        be the case. This allows us to continue serving from the old pods with
-        the old names.
+        and `namespace` if there's one we have saved in state. These are the same
+        in most cases, but if the `pod_template` has changed in between restarts,
+        it will no longer be the case. This allows us to continue serving from
+        the old pods with the old names.
         """
         if 'pod_name' in state:
             self.pod_name = state['pod_name']
+        if 'namespace' in state:
+            self.namespace = state['namespace']
 
     async def poll(self):
         """
